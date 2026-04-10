@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "AuraGrocery",
+  title: "GrocerySync",
   description: "Family grocery spend tracker",
 };
 

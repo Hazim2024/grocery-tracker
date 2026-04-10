@@ -64,7 +64,7 @@ export default function LoginPage() {
           </svg>
         </div>
         <span className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "var(--font-mono)" }}>
-          AuraGrocery
+          GrocerySync
         </span>
         <span className="text-slate-500 text-sm text-center">
           Family grocery spend tracker
