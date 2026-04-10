@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
   const { profile, household, householdMembers, signOut, joinHousehold } = useAuth();
@@ -10,6 +11,8 @@ export default function SettingsPage() {
   const [joinError, setJoinError] = useState("");
   const [joinLoading, setJoinLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const router = useRouter();
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const handleCopyCode = () => {
     if (household?.invite_code) {
@@ -38,7 +41,10 @@ export default function SettingsPage() {
       <h2 className="font-bold text-[28px] text-white mb-6">Settings</h2>
 
       {/* Profile Card */}
-      <div className="bg-[#0B0E14] embossed rounded-[20px] p-6 mb-6 border border-white/[0.03]">
+      <div
+        onClick={() => router.push("/profile")}
+        className="bg-[#0B0E14] embossed rounded-[20px] p-6 mb-6 border border-white/[0.03] cursor-pointer active:scale-[0.98] transition-transform"
+      >
         <div className="flex items-center gap-4">
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl"
@@ -51,12 +57,15 @@ export default function SettingsPage() {
           >
             {profile?.initial || "?"}
           </div>
-          <div>
+          <div className="flex-1">
             <div className="text-white font-bold text-lg">{profile?.name || "User"}</div>
             <div className="text-[11px] text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>
               {profile?.role === "admin" ? "Household Admin" : "Member"}
             </div>
           </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </div>
       </div>
 
@@ -148,7 +157,7 @@ export default function SettingsPage() {
             </svg>
           </button>
           <button
-            onClick={handleSignOut}
+            onClick={() => setShowSignOutConfirm(true)}
             className="flex items-center justify-between px-[18px] py-4 bg-[#0B0E14] border-none cursor-pointer text-white hover:bg-white/[0.02] transition-colors w-full"
             style={{ borderRadius: "4px 4px 16px 16px" }}
           >
@@ -162,7 +171,28 @@ export default function SettingsPage() {
           </button>
         </div>
       </section>
-
+      {showSignOutConfirm && (
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-7">
+          <p className="text-white font-semibold text-sm mb-1">Sign out?</p>
+          <p className="text-slate-400 text-xs mb-4 leading-relaxed">
+            You'll need to sign back in to access your household and transactions.
+          </p>
+          <div className="flex gap-2.5">
+            <button
+              onClick={() => setShowSignOutConfirm(false)}
+              className="flex-1 py-2.5 rounded-xl bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer bg-white/10 text-white"
+            >
+              Yes, sign out
+            </button>
+          </div>
+        </div>
+      )}
       {/* Join Modal */}
       {showJoinModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-6">

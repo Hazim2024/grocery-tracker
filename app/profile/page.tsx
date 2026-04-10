@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const handleDeleteAccount = async () => {
     setDeleteLoading(true);
@@ -99,12 +100,35 @@ export default function ProfilePage() {
       </div>
 
       {/* Sign Out */}
-      <button
-        onClick={signOut}
-        className="w-full py-3.5 rounded-full bg-transparent border border-white/10 text-slate-300 font-semibold text-sm cursor-pointer mb-3"
-      >
-        Sign Out
-      </button>
+      {!showSignOutConfirm ? (
+        <button
+          onClick={() => setShowSignOutConfirm(true)}
+          className="w-full py-3.5 rounded-full bg-transparent border border-white/10 text-slate-300 font-semibold text-sm cursor-pointer mb-3"
+        >
+          Sign Out
+        </button>
+      ) : (
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-3">
+          <p className="text-white font-semibold text-sm mb-1">Sign out?</p>
+          <p className="text-slate-400 text-xs mb-4 leading-relaxed">
+            You'll need to sign back in to access your household and transactions.
+          </p>
+          <div className="flex gap-2.5">
+            <button
+              onClick={() => setShowSignOutConfirm(false)}
+              className="flex-1 py-2.5 rounded-xl bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={signOut}
+              className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer bg-white/10 text-white"
+            >
+              Yes, sign out
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Delete Account */}
       {!showDeleteConfirm ? (
