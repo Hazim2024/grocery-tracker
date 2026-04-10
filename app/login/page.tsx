@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const { signIn, signUp } = useAuth();
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     setError("");
@@ -29,6 +31,7 @@ export default function LoginPage() {
     } else {
       const err = await signIn(email, password);
       if (err) setError(err);
+      else router.replace("/"); // Redirect to home after successful sign in
     }
 
     setLoading(false);
