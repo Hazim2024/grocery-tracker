@@ -31,7 +31,7 @@ export default function LoginPage() {
     } else {
       const err = await signIn(email, password);
       if (err) setError(err);
-      else router.replace("/"); // Redirect to home after successful sign in
+      else router.push("/");
     }
 
     setLoading(false);
