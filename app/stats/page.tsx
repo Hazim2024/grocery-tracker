@@ -102,7 +102,7 @@ export default function StatsPage() {
                   className="w-full rounded-sm transition-all duration-300"
                   style={{
                     height: `${Math.max(height, val > 0 ? 4 : 0)}%`,
-                    background: isToday ? "#00E5FF" : val > 0 ? "#00E5FF40" : "transparent",
+                    background: isToday ? "#3B82F6" : val > 0 ? "#3B82F640" : "transparent",
                     minHeight: val > 0 ? "3px" : "0px",
                   }}
                 />
@@ -123,9 +123,9 @@ export default function StatsPage() {
           onClick={() => setStatsView("category")}
           className="flex-1 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors"
           style={{
-            background: statsView === "category" ? "#00E5FF15" : "#0B0E14",
-            color: statsView === "category" ? "#00E5FF" : "#64748b",
-            border: statsView === "category" ? "1px solid #00E5FF30" : "1px solid transparent",
+            background: statsView === "category" ? "#3B82F615" : "#0B0E14",
+            color: statsView === "category" ? "#3B82F6" : "#64748b",
+            border: statsView === "category" ? "1px solid #3B82F630" : "1px solid transparent",
           }}
         >
           By Category
@@ -134,9 +134,9 @@ export default function StatsPage() {
           onClick={() => setStatsView("shop")}
           className="flex-1 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors"
           style={{
-            background: statsView === "shop" ? "#00E5FF15" : "#0B0E14",
-            color: statsView === "shop" ? "#00E5FF" : "#64748b",
-            border: statsView === "shop" ? "1px solid #00E5FF30" : "1px solid transparent",
+            background: statsView === "shop" ? "#3B82F615" : "#0B0E14",
+            color: statsView === "shop" ? "#3B82F6" : "#64748b",
+            border: statsView === "shop" ? "1px solid #3B82F630" : "1px solid transparent",
           }}
         >
           By Shop
@@ -167,7 +167,7 @@ export default function StatsPage() {
                 <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mt-3">
                   <div
                     className="h-full rounded-full"
-                    style={{ width: `${pct}%`, background: "#00E5FF", transition: "width 0.6s ease" }}
+                    style={{ width: `${pct}%`, background: "#3B82F6", transition: "width 0.6s ease" }}
                   />
                 </div>
                 <div className="text-[10px] text-slate-500 mt-1" style={{ fontFamily: "var(--font-mono)" }}>

@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 ] as const;
 
 function NavIcon({ type, active }: { type: string; active: boolean }) {
-  const color = active ? "#00E5FF" : "#64748b";
+  const color = active ? "#3B82F6" : "#64748b";
   switch (type) {
     case "log":
       return (
@@ -69,7 +69,7 @@ export default function BottomNav() {
             href={href}
             className={`flex flex-col items-center justify-center py-2 transition-all duration-200 no-underline ${
               active
-                ? "text-[#00E5FF] bg-[#050505] rounded-xl px-6"
+                ? "text-[#3B82F6] bg-[#050505] rounded-xl px-6"
                 : "text-slate-500 hover:text-slate-300 px-4"
             }`}
             style={

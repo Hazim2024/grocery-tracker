@@ -13,7 +13,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const MEMBERS: FamilyMember[] = [
-  { initial: "D", name: "David", color: "#00E5FF" },
+  { initial: "D", name: "David", color: "#3B82F6" },
   { initial: "M", name: "Maria", color: "#FF6B35" },
   { initial: "Y", name: "Yasmin", color: "#A78BFA" },
   { initial: "S", name: "Sam", color: "#34D399" },

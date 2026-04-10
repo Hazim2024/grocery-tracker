@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Generate a random color for new users
   const randomColor = () => {
-    const colors = ["#00E5FF", "#FF6B35", "#A78BFA", "#34D399", "#F472B6", "#FBBF24"];
+    const colors = ["#3B82F6", "#FF6B35", "#A78BFA", "#34D399", "#F472B6", "#FBBF24"];
     return colors[Math.floor(Math.random() * colors.length)];
   };
 

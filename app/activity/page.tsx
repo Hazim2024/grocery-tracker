@@ -39,7 +39,7 @@ export default function ActivityPage() {
       shop: editShop,
       category: editCategory,
       member: editMember,
-      color: selectedMember?.color || "#00E5FF",
+      color: selectedMember?.color || "#3B82F6",
     });
     setEditingId(null);
   };
@@ -120,12 +120,12 @@ export default function ActivityPage() {
                   }}
                 >
                   {isEditing ? (
-                    <div className="bg-[#0B0E14] rounded-2xl p-4 border border-[#00E5FF]/20">
+                    <div className="bg-[#0B0E14] rounded-2xl p-4 border border-[#3B82F6]/20">
                       <div className="flex gap-2 mb-3">
                         <select
                           value={editShop}
                           onChange={(e) => setEditShop(e.target.value)}
-                          className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30"
+                          className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30"
                         >
                           {SHOPS.map((s) => (
                             <option key={s.name} value={s.name}>{s.name}</option>
@@ -134,7 +134,7 @@ export default function ActivityPage() {
                         <select
                           value={editCategory}
                           onChange={(e) => setEditCategory(e.target.value)}
-                          className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30"
+                          className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30"
                         >
                           {CATEGORIES.map((c) => (
                             <option key={c.label} value={c.label}>{c.emoji} {c.label}</option>
@@ -156,7 +156,7 @@ export default function ActivityPage() {
                         <select
                           value={editMember}
                           onChange={(e) => setEditMember(e.target.value)}
-                          className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30"
+                          className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30"
                         >
                           {members.map((m) => (
                             <option key={m.id} value={m.name}>{m.name}</option>
@@ -173,7 +173,7 @@ export default function ActivityPage() {
                         <button
                           onClick={handleSaveEdit}
                           className="flex-1 py-2 rounded-lg font-semibold text-sm border-none cursor-pointer"
-                          style={{ background: "#00E5FF", color: "#050505" }}
+                          style={{ background: "#3B82F6", color: "#050505" }}
                         >
                           Save
                         </button>
@@ -238,7 +238,7 @@ export default function ActivityPage() {
                             <div className="flex flex-col gap-1">
                               <button
                                 onClick={() => handleEdit(tx)}
-                                className="text-slate-500 hover:text-[#00E5FF] transition-colors bg-transparent border-none cursor-pointer p-0.5"
+                                className="text-slate-500 hover:text-[#3B82F6] transition-colors bg-transparent border-none cursor-pointer p-0.5"
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -271,7 +271,7 @@ export default function ActivityPage() {
             className="w-full mt-6 py-4 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all active:scale-[0.97] embossed border border-white/[0.03] cursor-pointer"
             style={{
               background: copied ? "#34D39915" : "#0B0E14",
-              color: copied ? "#34D399" : "#00E5FF",
+              color: copied ? "#34D399" : "#3B82F6",
             }}
           >
             {copied ? (

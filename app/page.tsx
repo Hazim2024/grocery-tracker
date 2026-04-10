@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { SHOPS as DEFAULT_SHOPS, CATEGORIES as DEFAULT_CATEGORIES } from "@/lib/constants";
 import { useTransactions } from "@/context/TransactionContext";
 import { useAuth } from "@/context/AuthContext";
@@ -9,6 +10,7 @@ type CustomShop = { name: string; tag: string };
 type CustomCategory = { emoji: string; label: string };
 
 export default function QuickLogPage() {
+  const router = useRouter();
   const { transactions, addTransaction } = useTransactions();
   const { profile, household, householdMembers, createHousehold, joinHousehold } = useAuth();
   const [selectedShop, setSelectedShop] = useState<number | null>(null);
@@ -93,7 +95,7 @@ export default function QuickLogPage() {
       member: payer?.name || "Unknown",
       category: categories[selectedCategory].label,
       amount: parseFloat(amount),
-      color: payer?.color || "#00E5FF",
+      color: payer?.color || "#3B82F6",
     });
 
     setSaved(true);
@@ -156,7 +158,7 @@ export default function QuickLogPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round">
             <circle cx="12" cy="12" r="2" />
             <circle cx="12" cy="12" r="6" opacity="0.5" />
             <circle cx="12" cy="12" r="10" opacity="0.25" />
@@ -174,16 +176,17 @@ export default function QuickLogPage() {
           <button
             onClick={() => setEditMode(!editMode)}
             className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent border-none cursor-pointer"
-            style={{ color: editMode ? "#00E5FF" : "#64748b" }}
+            style={{ color: editMode ? "#3B82F6" : "#64748b" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
           </button>
           <div
+            onClick={() => router.push("/profile")}
             className="w-10 h-10 rounded-full bg-[#0B0E14] border border-white/5 flex items-center justify-center font-bold text-sm"
-            style={{ fontFamily: "var(--font-mono)", color: profile?.color || "#00E5FF" }}
+            style={{ fontFamily: "var(--font-mono)", color: profile?.color || "#3B82F6" }}
           >
             {profile?.initial || "?"}
           </div>
@@ -192,7 +195,7 @@ export default function QuickLogPage() {
 
       {/* Floating Household Setup Card */}
       {!household && (
-        <div className="bg-[#0B0E14] rounded-2xl border border-[#00E5FF]/20 overflow-hidden shadow-lg shadow-[#00E5FF]/5">
+        <div className="bg-[#0B0E14] rounded-2xl border border-[#3B82F6]/20 overflow-hidden shadow-lg shadow-[#3B82F6]/5">
           {setupView === "choose" && (
             <div className="p-5">
               <div className="flex items-center gap-2 mb-1">
@@ -206,13 +209,13 @@ export default function QuickLogPage() {
                 <button
                   onClick={() => { setSetupView("create"); setSetupError(""); }}
                   className="flex-1 py-3 rounded-xl font-semibold text-sm border-none cursor-pointer active:scale-[0.97] transition-transform"
-                  style={{ background: "linear-gradient(135deg, #00E5FF, #00B8D4)", color: "#050505" }}
+                  style={{ background: "linear-gradient(135deg, #3B82F6, #00B8D4)", color: "#050505" }}
                 >
                   🏠 Create
                 </button>
                 <button
                   onClick={() => { setSetupView("join"); setSetupError(""); }}
-                  className="flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer active:scale-[0.97] transition-transform bg-transparent border border-[#00E5FF]/30 text-[#00E5FF]"
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer active:scale-[0.97] transition-transform bg-transparent border border-[#3B82F6]/30 text-[#3B82F6]"
                 >
                   🔗 Join
                 </button>
@@ -227,12 +230,12 @@ export default function QuickLogPage() {
                 value={householdName}
                 onChange={(e) => setHouseholdName(e.target.value)}
                 placeholder="e.g. The Smiths"
-                className="w-full bg-[#050505] rounded-xl px-4 py-3 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600 mb-3"
+                className="w-full bg-[#050505] rounded-xl px-4 py-3 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600 mb-3"
               />
               {setupError && <div className="text-[12px] text-[#FF4B4B] mb-3">{setupError}</div>}
               <div className="flex gap-2.5">
                 <button onClick={() => { setSetupView("choose"); setSetupError(""); }} className="flex-1 py-2.5 rounded-xl bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer">Back</button>
-                <button onClick={handleCreate} disabled={setupLoading} className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505", opacity: setupLoading ? 0.6 : 1 }}>
+                <button onClick={handleCreate} disabled={setupLoading} className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505", opacity: setupLoading ? 0.6 : 1 }}>
                   {setupLoading ? "Creating..." : "Create"}
                 </button>
               </div>
@@ -247,13 +250,13 @@ export default function QuickLogPage() {
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 placeholder="ABC123"
                 maxLength={6}
-                className="w-full bg-[#050505] rounded-xl px-4 py-3 text-white text-center text-lg tracking-[0.4em] border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600 mb-3"
+                className="w-full bg-[#050505] rounded-xl px-4 py-3 text-white text-center text-lg tracking-[0.4em] border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600 mb-3"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
               {setupError && <div className="text-[12px] text-[#FF4B4B] mb-3">{setupError}</div>}
               <div className="flex gap-2.5">
                 <button onClick={() => { setSetupView("choose"); setSetupError(""); }} className="flex-1 py-2.5 rounded-xl bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer">Back</button>
-                <button onClick={handleJoin} disabled={setupLoading} className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505", opacity: setupLoading ? 0.6 : 1 }}>
+                <button onClick={handleJoin} disabled={setupLoading} className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505", opacity: setupLoading ? 0.6 : 1 }}>
                   {setupLoading ? "Joining..." : "Join"}
                 </button>
               </div>
@@ -271,7 +274,7 @@ export default function QuickLogPage() {
           {editMode && (
             <button
               onClick={() => setShowAddShop(true)}
-              className="text-[#00E5FF] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
+              className="text-[#3B82F6] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               + Add
@@ -280,7 +283,7 @@ export default function QuickLogPage() {
         </div>
 
         {showAddShop && (
-          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#00E5FF]/20 flex gap-2">
+          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#3B82F6]/20 flex gap-2">
             <input
               type="text"
               value={newShopName}
@@ -295,7 +298,7 @@ export default function QuickLogPage() {
               placeholder="Tag"
               className="w-20 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600"
             />
-            <button onClick={handleAddShop} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505" }}>Add</button>
+            <button onClick={handleAddShop} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505" }}>Add</button>
             <button onClick={() => setShowAddShop(false)} className="px-2 py-2 rounded-lg text-slate-400 text-sm bg-transparent border-none cursor-pointer">✕</button>
           </div>
         )}
@@ -309,7 +312,7 @@ export default function QuickLogPage() {
                 onClick={() => !editMode && setSelectedShop(i)}
                 className={`aspect-square rounded-2xl flex flex-col items-center justify-center p-4 transition-transform active:scale-95 duration-150 relative cursor-pointer ${
                   active
-                    ? "bg-[#050505] debossed border border-[#00E5FF]/30"
+                    ? "bg-[#050505] debossed border border-[#3B82F6]/30"
                     : "bg-[#0B0E14] embossed border border-white/[0.03]"
                 }`}
               >
@@ -321,11 +324,11 @@ export default function QuickLogPage() {
                     ✕
                   </button>
                 )}
-                <span className={`font-semibold text-lg ${active ? "text-[#00E5FF]" : "text-white"}`}>
+                <span className={`font-semibold text-lg ${active ? "text-[#3B82F6]" : "text-white"}`}>
                   {shop.name}
                 </span>
                 <span
-                  className={`text-[10px] mt-1 uppercase tracking-wide ${active ? "text-[#00E5FF]/60" : "text-slate-500"}`}
+                  className={`text-[10px] mt-1 uppercase tracking-wide ${active ? "text-[#3B82F6]/60" : "text-slate-500"}`}
                   style={{ fontFamily: "var(--font-mono)" }}
                 >
                   {active ? "Selected" : shop.tag}
@@ -351,7 +354,7 @@ export default function QuickLogPage() {
             value={amount}
             onChange={(e) => handleAmount(e.target.value)}
             className="bg-transparent border-none focus:ring-0 focus:outline-none text-5xl text-white text-center w-full placeholder-slate-800"
-            style={{ fontFamily: "var(--font-mono)", caretColor: "#00E5FF" }}
+            style={{ fontFamily: "var(--font-mono)", caretColor: "#3B82F6" }}
           />
         </div>
       </section>
@@ -365,7 +368,7 @@ export default function QuickLogPage() {
           {editMode && (
             <button
               onClick={() => setShowAddCategory(true)}
-              className="text-[#00E5FF] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
+              className="text-[#3B82F6] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               + Add
@@ -374,7 +377,7 @@ export default function QuickLogPage() {
         </div>
 
         {showAddCategory && (
-          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#00E5FF]/20 flex gap-2">
+          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#3B82F6]/20 flex gap-2">
             <input
               type="text"
               value={newCatEmoji}
@@ -389,12 +392,12 @@ export default function QuickLogPage() {
               placeholder="Category name"
               className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600"
             />
-            <button onClick={handleAddCategory} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505" }}>Add</button>
+            <button onClick={handleAddCategory} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505" }}>Add</button>
             <button onClick={() => setShowAddCategory(false)} className="px-2 py-2 rounded-lg text-slate-400 text-sm bg-transparent border-none cursor-pointer">✕</button>
           </div>
         )}
 
-        <div className="flex overflow-x-auto gap-3 pb-2 hide-scrollbar">
+        <div className="flex overflow-x-auto gap-3 pt-3 pb-2 hide-scrollbar">
           {categories.map((cat, i) => {
             const active = selectedCategory === i;
             return (
@@ -411,8 +414,8 @@ export default function QuickLogPage() {
                   onClick={() => !editMode && setSelectedCategory(i)}
                   className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
                     active
-                      ? "bg-[#050505] debossed border border-[#00E5FF]/30 text-[#00E5FF]"
-                      : "bg-[#0B0E14] embossed border border-white/5 hover:text-[#00E5FF]"
+                      ? "bg-[#050505] debossed border border-[#3B82F6]/30 text-[#3B82F6]"
+                      : "bg-[#0B0E14] embossed border border-white/5 hover:text-[#3B82F6]"
                   }`}
                 >
                   {cat.emoji} {cat.label}
@@ -466,9 +469,9 @@ export default function QuickLogPage() {
         disabled={!canSave}
         className={`w-full py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 active:scale-95 transition-all embossed ${
           canSave ? "bg-[#0B0E14] text-white cursor-pointer" : "bg-[#0B0E14] text-white/40 cursor-not-allowed"
-        } ${saved ? "!bg-[#00E5FF]/10" : ""}`}
+        } ${saved ? "!bg-[#3B82F6]/10" : ""}`}
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>

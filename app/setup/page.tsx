@@ -75,7 +75,7 @@ export default function SetupPage() {
               value={householdName}
               onChange={(e) => setHouseholdName(e.target.value)}
               placeholder="e.g. The Smiths"
-              className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600"
+              className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600"
             />
           </div>
 
@@ -87,7 +87,7 @@ export default function SetupPage() {
             onClick={handleCreate}
             disabled={loading}
             className="w-full py-4 rounded-full font-bold text-lg embossed active:scale-95 transition-all"
-            style={{ background: "linear-gradient(135deg, #00E5FF, #00B8D4)", color: "#050505", opacity: loading ? 0.6 : 1 }}
+            style={{ background: "linear-gradient(135deg, #3B82F6, #00B8D4)", color: "#050505", opacity: loading ? 0.6 : 1 }}
           >
             {loading ? "Creating..." : "CREATE HOUSEHOLD"}
           </button>
@@ -110,7 +110,7 @@ export default function SetupPage() {
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               placeholder="e.g. ABC123"
               maxLength={6}
-              className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600"
+              className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600"
               style={{ fontFamily: "var(--font-mono)" }}
             />
           </div>
@@ -123,7 +123,7 @@ export default function SetupPage() {
             onClick={handleJoin}
             disabled={loading}
             className="w-full py-4 rounded-full font-bold text-lg embossed active:scale-95 transition-all"
-            style={{ background: "linear-gradient(135deg, #00E5FF, #00B8D4)", color: "#050505", opacity: loading ? 0.6 : 1 }}
+            style={{ background: "linear-gradient(135deg, #3B82F6, #00B8D4)", color: "#050505", opacity: loading ? 0.6 : 1 }}
           >
             {loading ? "Joining..." : "JOIN HOUSEHOLD"}
           </button>

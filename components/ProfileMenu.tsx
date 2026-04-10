@@ -61,7 +61,7 @@ export default function ProfileMenu() {
       <button
         onClick={() => { setOpen(!open); setView("menu"); setError(""); }}
         className="w-10 h-10 rounded-full bg-[#0B0E14] border border-white/5 flex items-center justify-center font-bold text-sm cursor-pointer transition-all"
-        style={{ fontFamily: "var(--font-mono)", color: profile?.color || "#00E5FF" }}
+        style={{ fontFamily: "var(--font-mono)", color: profile?.color || "#3B82F6" }}
       >
         {profile?.initial || "?"}
       </button>
@@ -87,13 +87,13 @@ export default function ProfileMenu() {
                     Invite Code
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[#00E5FF] font-bold tracking-[0.2em] text-sm" style={{ fontFamily: "var(--font-mono)" }}>
+                    <span className="text-[#3B82F6] font-bold tracking-[0.2em] text-sm" style={{ fontFamily: "var(--font-mono)" }}>
                       {household.invite_code}
                     </span>
                     <button
                       onClick={handleCopy}
                       className="text-[11px] px-2.5 py-1 rounded-md border-none cursor-pointer"
-                      style={{ background: copied ? "#34D39920" : "#00E5FF15", color: copied ? "#34D399" : "#00E5FF" }}
+                      style={{ background: copied ? "#34D39920" : "#3B82F615", color: copied ? "#34D399" : "#3B82F6" }}
                     >
                       {copied ? "Copied!" : "Copy"}
                     </button>
@@ -136,7 +136,7 @@ export default function ProfileMenu() {
                 value={householdName}
                 onChange={(e) => setHouseholdName(e.target.value)}
                 placeholder="e.g. The Smiths"
-                className="w-full bg-[#050505] rounded-lg px-3 py-2.5 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600 mb-2"
+                className="w-full bg-[#050505] rounded-lg px-3 py-2.5 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600 mb-2"
               />
               {error && <div className="text-[11px] text-[#FF4B4B] mb-2">{error}</div>}
               <div className="flex gap-2">
@@ -150,7 +150,7 @@ export default function ProfileMenu() {
                   onClick={handleCreate}
                   disabled={loading}
                   className="flex-1 py-2 rounded-lg font-semibold text-sm border-none cursor-pointer"
-                  style={{ background: "#00E5FF", color: "#050505", opacity: loading ? 0.6 : 1 }}
+                  style={{ background: "#3B82F6", color: "#050505", opacity: loading ? 0.6 : 1 }}
                 >
                   {loading ? "..." : "Create"}
                 </button>
@@ -167,7 +167,7 @@ export default function ProfileMenu() {
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 placeholder="ABC123"
                 maxLength={6}
-                className="w-full bg-[#050505] rounded-lg px-3 py-2.5 text-white text-sm text-center tracking-[0.3em] border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600 mb-2"
+                className="w-full bg-[#050505] rounded-lg px-3 py-2.5 text-white text-sm text-center tracking-[0.3em] border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600 mb-2"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
               {error && <div className="text-[11px] text-[#FF4B4B] mb-2">{error}</div>}
@@ -182,7 +182,7 @@ export default function ProfileMenu() {
                   onClick={handleJoin}
                   disabled={loading}
                   className="flex-1 py-2 rounded-lg font-semibold text-sm border-none cursor-pointer"
-                  style={{ background: "#00E5FF", color: "#050505", opacity: loading ? 0.6 : 1 }}
+                  style={{ background: "#3B82F6", color: "#050505", opacity: loading ? 0.6 : 1 }}
                 >
                   {loading ? "..." : "Join"}
                 </button>

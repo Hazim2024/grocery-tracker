@@ -44,9 +44,9 @@ export default function SettingsPage() {
             className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl"
             style={{
               fontFamily: "var(--font-mono)",
-              background: `${profile?.color || "#00E5FF"}15`,
-              border: `2px solid ${profile?.color || "#00E5FF"}40`,
-              color: profile?.color || "#00E5FF",
+              background: `${profile?.color || "#3B82F6"}15`,
+              border: `2px solid ${profile?.color || "#3B82F6"}40`,
+              color: profile?.color || "#3B82F6",
             }}
           >
             {profile?.initial || "?"}
@@ -73,7 +73,7 @@ export default function SettingsPage() {
                 <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1" style={{ fontFamily: "var(--font-mono)" }}>
                   Invite Code
                 </div>
-                <div className="text-[#00E5FF] font-bold text-xl tracking-[0.3em]" style={{ fontFamily: "var(--font-mono)" }}>
+                <div className="text-[#3B82F6] font-bold text-xl tracking-[0.3em]" style={{ fontFamily: "var(--font-mono)" }}>
                   {household.invite_code}
                 </div>
               </div>
@@ -81,8 +81,8 @@ export default function SettingsPage() {
                 onClick={handleCopyCode}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-colors border-none cursor-pointer"
                 style={{
-                  background: copied ? "#34D39920" : "#00E5FF15",
-                  color: copied ? "#34D399" : "#00E5FF",
+                  background: copied ? "#34D39920" : "#3B82F615",
+                  color: copied ? "#34D399" : "#3B82F6",
                 }}
               >
                 {copied ? "Copied!" : "Copy"}
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 placeholder="e.g. ABC123"
                 maxLength={6}
-                className="w-full bg-[#050505] rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600"
+                className="w-full bg-[#050505] rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600"
                 style={{ fontFamily: "var(--font-mono)" }}
               />
             </div>
@@ -199,7 +199,7 @@ export default function SettingsPage() {
                 disabled={joinLoading}
                 className="flex-1 py-3 rounded-full font-bold cursor-pointer border-none"
                 style={{
-                  background: "linear-gradient(135deg, #00E5FF, #00B8D4)",
+                  background: "linear-gradient(135deg, #3B82F6, #00B8D4)",
                   color: "#050505",
                   opacity: joinLoading ? 0.6 : 1,
                 }}

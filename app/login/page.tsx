@@ -40,11 +40,11 @@ export default function LoginPage() {
         <div className="text-4xl mb-4">📧</div>
         <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
         <p className="text-slate-400 text-sm text-center">
-          We sent a confirmation link to <span className="text-[#00E5FF]">{email}</span>. Click it to activate your account, then come back and sign in.
+          We sent a confirmation link to <span className="text-[#3B82F6]">{email}</span>. Click it to activate your account, then come back and sign in.
         </p>
         <button
           onClick={() => { setCheckEmail(false); setIsSignUp(false); }}
-          className="mt-6 text-[#00E5FF] text-sm font-medium bg-transparent border-none cursor-pointer"
+          className="mt-6 text-[#3B82F6] text-sm font-medium bg-transparent border-none cursor-pointer"
         >
           Back to Sign In
         </button>
@@ -57,7 +57,7 @@ export default function LoginPage() {
       {/* Logo & Branding */}
       <div className="flex flex-col items-center mb-10">
         <div className="relative mb-4">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeLinecap="round">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round">
             <circle cx="12" cy="12" r="2" />
             <circle cx="12" cy="12" r="6" opacity="0.5" />
             <circle cx="12" cy="12" r="10" opacity="0.25" />
@@ -74,15 +74,15 @@ export default function LoginPage() {
       {/* Feature Highlights */}
       <div className="flex flex-col gap-3 mb-10">
         <div className="flex items-center gap-3 px-2">
-          <div className="w-8 h-8 rounded-lg bg-[#00E5FF]/10 flex items-center justify-center text-sm">📊</div>
+          <div className="w-8 h-8 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center text-sm">📊</div>
           <span className="text-slate-300 text-sm">Track every grocery trip in seconds</span>
         </div>
         <div className="flex items-center gap-3 px-2">
-          <div className="w-8 h-8 rounded-lg bg-[#00E5FF]/10 flex items-center justify-center text-sm">👨‍👩‍👧‍👦</div>
+          <div className="w-8 h-8 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center text-sm">👨‍👩‍👧‍👦</div>
           <span className="text-slate-300 text-sm">Sync spending across your household</span>
         </div>
         <div className="flex items-center gap-3 px-2">
-          <div className="w-8 h-8 rounded-lg bg-[#00E5FF]/10 flex items-center justify-center text-sm">📈</div>
+          <div className="w-8 h-8 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center text-sm">📈</div>
           <span className="text-slate-300 text-sm">See who spends what, and where</span>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Hazim"
-              className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600"
+              className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600"
             />
           </div>
         )}
@@ -120,7 +120,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@email.com"
-            className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600"
+            className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600"
           />
         </div>
 
@@ -133,7 +133,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Min 6 characters"
-            className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600"
+            className="w-full bg-[#0B0E14] embossed rounded-xl px-4 py-3 text-white border-none focus:outline-none focus:ring-1 focus:ring-[#3B82F6]/30 placeholder-slate-600"
           />
         </div>
       </div>
@@ -149,7 +149,7 @@ export default function LoginPage() {
         disabled={loading}
         className="w-full mt-5 py-4 rounded-full font-bold text-lg flex items-center justify-center embossed transition-all active:scale-95 border-none cursor-pointer"
         style={{
-          background: "linear-gradient(135deg, #00E5FF, #00B8D4)",
+          background: "linear-gradient(135deg, #3B82F6, #00B8D4)",
           color: "#050505",
           opacity: loading ? 0.6 : 1,
         }}
