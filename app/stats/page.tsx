@@ -92,12 +92,23 @@ export default function StatsPage() {
         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>
           Daily Spending
         </h3>
-        <div className="flex items-end gap-[2px] h-[120px]">
+        <div className="flex items-end gap-[2px] h-[120px] relative">
           {dailySpend.map((val, i) => {
             const height = maxDaily > 0 ? (val / maxDaily) * 100 : 0;
             const isToday = isCurrentMonth && i + 1 === now.getDate();
             return (
-              <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+              <div
+                key={i}
+                className="flex-1 flex flex-col items-center justify-end h-full relative group"
+              >
+                {/* Tooltip */}
+                {val > 0 && (
+                  <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[#1E2533] text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+                    style={{ fontFamily: "var(--font-mono)" }}
+                  >
+                    £{val.toFixed(2)}
+                  </div>
+                )}
                 <div
                   className="w-full rounded-sm transition-all duration-300"
                   style={{
@@ -123,9 +134,9 @@ export default function StatsPage() {
           onClick={() => setStatsView("category")}
           className="flex-1 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors"
           style={{
-            background: statsView === "category" ? "#3B82F615" : "#0B0E14",
-            color: statsView === "category" ? "#3B82F6" : "#64748b",
-            border: statsView === "category" ? "1px solid #3B82F630" : "1px solid transparent",
+            background: statsView === "category" ? "#00E5FF15" : "#0B0E14",
+            color: statsView === "category" ? "#00E5FF" : "#64748b",
+            border: statsView === "category" ? "1px solid #00E5FF30" : "1px solid transparent",
           }}
         >
           By Category
@@ -134,9 +145,9 @@ export default function StatsPage() {
           onClick={() => setStatsView("shop")}
           className="flex-1 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors"
           style={{
-            background: statsView === "shop" ? "#3B82F615" : "#0B0E14",
-            color: statsView === "shop" ? "#3B82F6" : "#64748b",
-            border: statsView === "shop" ? "1px solid #3B82F630" : "1px solid transparent",
+            background: statsView === "shop" ? "#00E5FF15" : "#0B0E14",
+            color: statsView === "shop" ? "#00E5FF" : "#64748b",
+            border: statsView === "shop" ? "1px solid #00E5FF30" : "1px solid transparent",
           }}
         >
           By Shop
@@ -167,7 +178,7 @@ export default function StatsPage() {
                 <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mt-3">
                   <div
                     className="h-full rounded-full"
-                    style={{ width: `${pct}%`, background: "#3B82F6", transition: "width 0.6s ease" }}
+                    style={{ width: `${pct}%`, background: "#00E5FF", transition: "width 0.6s ease" }}
                   />
                 </div>
                 <div className="text-[10px] text-slate-500 mt-1" style={{ fontFamily: "var(--font-mono)" }}>
