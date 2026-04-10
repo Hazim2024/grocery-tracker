@@ -1,20 +1,15 @@
-import type { Shop, Category, FamilyMember } from "../types";
+import type { Shop, Category, FamilyMember } from "@/types";
 
 export const SHOPS: Shop[] = [
-  { name: "Aldi", tag: "Freq: High" },
-  { name: "Costco", tag: "Freq: Mid" },
-  { name: "Butcher", tag: "Local" },
-  { name: "Walmart", tag: "Retail" },
-  { name: "Target", tag: "Retail" },
-  { name: "Shell", tag: "Fuel" },
+  { name: "Lidl", tag: "" },
+  { name: "Asda", tag: "" },
+  { name: "Arab Shop", tag: "" },
+  { name: "Ethiopian Shop", tag: "" },
 ];
 
 export const CATEGORIES: Category[] = [
   { emoji: "🍎", label: "Grocery" },
   { emoji: "🥩", label: "Meat" },
-  { emoji: "🍕", label: "Food" },
-  { emoji: "🧼", label: "Household" },
-  { emoji: "✨", label: "Misc" },
 ];
 
 export const MEMBERS: FamilyMember[] = [

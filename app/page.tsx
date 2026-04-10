@@ -1,14 +1,72 @@
 "use client";
 
-import { useState } from "react";
-import { SHOPS, CATEGORIES, MEMBERS } from "@/lib/constants";
+import { useState, useEffect } from "react";
+import { SHOPS as DEFAULT_SHOPS, CATEGORIES as DEFAULT_CATEGORIES } from "@/lib/constants";
+import { useTransactions } from "@/context/TransactionContext";
+import { useAuth } from "@/context/AuthContext";
+
+type CustomShop = { name: string; tag: string };
+type CustomCategory = { emoji: string; label: string };
 
 export default function QuickLogPage() {
+  const { transactions, addTransaction } = useTransactions();
+  const { profile, household, householdMembers, createHousehold, joinHousehold } = useAuth();
   const [selectedShop, setSelectedShop] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedPayer, setSelectedPayer] = useState(0);
   const [amount, setAmount] = useState("");
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  // Custom shops & categories (persisted in localStorage)
+  const [shops, setShops] = useState<CustomShop[]>(DEFAULT_SHOPS);
+  const [categories, setCategories] = useState<CustomCategory[]>(DEFAULT_CATEGORIES);
+  const [showAddShop, setShowAddShop] = useState(false);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newShopName, setNewShopName] = useState("");
+  const [newShopTag, setNewShopTag] = useState("");
+  const [newCatEmoji, setNewCatEmoji] = useState("");
+  const [newCatLabel, setNewCatLabel] = useState("");
+  const [editMode, setEditMode] = useState(false);
+
+  // Household setup state
+  const [setupView, setSetupView] = useState<"choose" | "create" | "join">("choose");
+  const [householdName, setHouseholdName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [setupError, setSetupError] = useState("");
+  const [setupLoading, setSetupLoading] = useState(false);
+
+  // Load custom shops/categories from localStorage
+  useEffect(() => {
+    const savedShops = localStorage.getItem("custom_shops");
+    const savedCats = localStorage.getItem("custom_categories");
+    if (savedShops) setShops(JSON.parse(savedShops));
+    if (savedCats) setCategories(JSON.parse(savedCats));
+  }, []);
+
+  // Save to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem("custom_shops", JSON.stringify(shops));
+  }, [shops]);
+  useEffect(() => {
+    localStorage.setItem("custom_categories", JSON.stringify(categories));
+  }, [categories]);
+
+  // Default payer = logged in user
+  const payers = household
+    ? householdMembers
+    : profile
+      ? [{ id: profile.id, initial: profile.initial, name: profile.name, color: profile.color }]
+      : [];
+
+  useEffect(() => {
+    if (profile && payers.length > 0) {
+      const myIndex = payers.findIndex((p) => p.name === profile.name);
+      if (myIndex >= 0) setSelectedPayer(myIndex);
+    }
+  }, [profile, payers.length]);
+
+  const totalSpend = transactions.reduce((sum, t) => sum + t.amount, 0);
 
   const handleAmount = (val: string) => {
     const clean = val.replace(/[^0-9.]/g, "");
@@ -20,8 +78,24 @@ export default function QuickLogPage() {
 
   const canSave = selectedShop !== null && amount !== "" && selectedCategory !== null;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!canSave) return;
+    setSaveError("");
+
+    if (!household) {
+      setSaveError("Set up your household first to save transactions");
+      return;
+    }
+
+    const payer = payers[selectedPayer];
+    await addTransaction({
+      shop: shops[selectedShop].name,
+      member: payer?.name || "Unknown",
+      category: categories[selectedCategory].label,
+      amount: parseFloat(amount),
+      color: payer?.color || "#00E5FF",
+    });
+
     setSaved(true);
     setTimeout(() => {
       setAmount("");
@@ -29,6 +103,52 @@ export default function QuickLogPage() {
       setSelectedCategory(null);
       setSaved(false);
     }, 1200);
+  };
+
+  const handleAddShop = () => {
+    if (!newShopName.trim()) return;
+    setShops((prev) => [...prev, { name: newShopName.trim(), tag: newShopTag.trim() || "Custom" }]);
+    setNewShopName("");
+    setNewShopTag("");
+    setShowAddShop(false);
+  };
+
+  const handleDeleteShop = (index: number) => {
+    setShops((prev) => prev.filter((_, i) => i !== index));
+    if (selectedShop === index) setSelectedShop(null);
+    else if (selectedShop !== null && selectedShop > index) setSelectedShop(selectedShop - 1);
+  };
+
+  const handleAddCategory = () => {
+    if (!newCatLabel.trim()) return;
+    setCategories((prev) => [...prev, { emoji: newCatEmoji.trim() || "🏷️", label: newCatLabel.trim() }]);
+    setNewCatEmoji("");
+    setNewCatLabel("");
+    setShowAddCategory(false);
+  };
+
+  const handleDeleteCategory = (index: number) => {
+    setCategories((prev) => prev.filter((_, i) => i !== index));
+    if (selectedCategory === index) setSelectedCategory(null);
+    else if (selectedCategory !== null && selectedCategory > index) setSelectedCategory(selectedCategory - 1);
+  };
+
+  const handleCreate = async () => {
+    if (!householdName.trim()) return;
+    setSetupLoading(true);
+    setSetupError("");
+    const err = await createHousehold(householdName);
+    if (err) setSetupError(err);
+    setSetupLoading(false);
+  };
+
+  const handleJoin = async () => {
+    if (!inviteCode.trim()) return;
+    setSetupLoading(true);
+    setSetupError("");
+    const err = await joinHousehold(inviteCode);
+    if (err) setSetupError(err);
+    setSetupLoading(false);
   };
 
   return (
@@ -43,36 +163,164 @@ export default function QuickLogPage() {
           </svg>
           <div>
             <div className="text-[10px] uppercase tracking-[3px] text-slate-500" style={{ fontFamily: "var(--font-mono)" }}>
-              Family Spend
+              {household ? "Family Spend" : "My Spend"}
             </div>
             <div className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: "var(--font-mono)" }}>
-              $1,240.50
+              ${totalSpend.toFixed(2)}
             </div>
           </div>
         </div>
-        <div className="w-10 h-10 rounded-full bg-[#0B0E14] border border-white/5 flex items-center justify-center font-bold text-[#00E5FF] text-sm" style={{ fontFamily: "var(--font-mono)" }}>
-          D
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setEditMode(!editMode)}
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent border-none cursor-pointer"
+            style={{ color: editMode ? "#00E5FF" : "#64748b" }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+          <div
+            className="w-10 h-10 rounded-full bg-[#0B0E14] border border-white/5 flex items-center justify-center font-bold text-sm"
+            style={{ fontFamily: "var(--font-mono)", color: profile?.color || "#00E5FF" }}
+          >
+            {profile?.initial || "?"}
+          </div>
         </div>
       </div>
 
+      {/* Floating Household Setup Card */}
+      {!household && (
+        <div className="bg-[#0B0E14] rounded-2xl border border-[#00E5FF]/20 overflow-hidden shadow-lg shadow-[#00E5FF]/5">
+          {setupView === "choose" && (
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">👋</span>
+                <h3 className="text-white font-bold text-[15px]">Welcome, {profile?.name}!</h3>
+              </div>
+              <p className="text-slate-400 text-[12px] mb-4 leading-relaxed">
+                Create a household to start saving transactions, or join an existing one with a code.
+              </p>
+              <div className="flex gap-2.5">
+                <button
+                  onClick={() => { setSetupView("create"); setSetupError(""); }}
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm border-none cursor-pointer active:scale-[0.97] transition-transform"
+                  style={{ background: "linear-gradient(135deg, #00E5FF, #00B8D4)", color: "#050505" }}
+                >
+                  🏠 Create
+                </button>
+                <button
+                  onClick={() => { setSetupView("join"); setSetupError(""); }}
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer active:scale-[0.97] transition-transform bg-transparent border border-[#00E5FF]/30 text-[#00E5FF]"
+                >
+                  🔗 Join
+                </button>
+              </div>
+            </div>
+          )}
+          {setupView === "create" && (
+            <div className="p-5">
+              <h3 className="text-white font-bold text-[15px] mb-3">Create Household</h3>
+              <input
+                type="text"
+                value={householdName}
+                onChange={(e) => setHouseholdName(e.target.value)}
+                placeholder="e.g. The Smiths"
+                className="w-full bg-[#050505] rounded-xl px-4 py-3 text-white text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600 mb-3"
+              />
+              {setupError && <div className="text-[12px] text-[#FF4B4B] mb-3">{setupError}</div>}
+              <div className="flex gap-2.5">
+                <button onClick={() => { setSetupView("choose"); setSetupError(""); }} className="flex-1 py-2.5 rounded-xl bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer">Back</button>
+                <button onClick={handleCreate} disabled={setupLoading} className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505", opacity: setupLoading ? 0.6 : 1 }}>
+                  {setupLoading ? "Creating..." : "Create"}
+                </button>
+              </div>
+            </div>
+          )}
+          {setupView === "join" && (
+            <div className="p-5">
+              <h3 className="text-white font-bold text-[15px] mb-3">Join Household</h3>
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                placeholder="ABC123"
+                maxLength={6}
+                className="w-full bg-[#050505] rounded-xl px-4 py-3 text-white text-center text-lg tracking-[0.4em] border-none focus:outline-none focus:ring-1 focus:ring-[#00E5FF]/30 placeholder-slate-600 mb-3"
+                style={{ fontFamily: "var(--font-mono)" }}
+              />
+              {setupError && <div className="text-[12px] text-[#FF4B4B] mb-3">{setupError}</div>}
+              <div className="flex gap-2.5">
+                <button onClick={() => { setSetupView("choose"); setSetupError(""); }} className="flex-1 py-2.5 rounded-xl bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer">Back</button>
+                <button onClick={handleJoin} disabled={setupLoading} className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505", opacity: setupLoading ? 0.6 : 1 }}>
+                  {setupLoading ? "Joining..." : "Join"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Shop Grid */}
       <section>
-        <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4" style={{ fontFamily: "var(--font-mono)" }}>
-          Select Shop
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>
+            Select Shop
+          </h2>
+          {editMode && (
+            <button
+              onClick={() => setShowAddShop(true)}
+              className="text-[#00E5FF] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
+              style={{ fontFamily: "var(--font-mono)" }}
+            >
+              + Add
+            </button>
+          )}
+        </div>
+
+        {showAddShop && (
+          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#00E5FF]/20 flex gap-2">
+            <input
+              type="text"
+              value={newShopName}
+              onChange={(e) => setNewShopName(e.target.value)}
+              placeholder="Shop name"
+              className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600"
+            />
+            <input
+              type="text"
+              value={newShopTag}
+              onChange={(e) => setNewShopTag(e.target.value)}
+              placeholder="Tag"
+              className="w-20 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600"
+            />
+            <button onClick={handleAddShop} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505" }}>Add</button>
+            <button onClick={() => setShowAddShop(false)} className="px-2 py-2 rounded-lg text-slate-400 text-sm bg-transparent border-none cursor-pointer">✕</button>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
-          {SHOPS.map((shop, i) => {
+          {shops.map((shop, i) => {
             const active = selectedShop === i;
             return (
-              <button
-                key={shop.name}
-                onClick={() => setSelectedShop(i)}
-                className={`aspect-square rounded-2xl flex flex-col items-center justify-center p-4 transition-transform active:scale-95 duration-150 ${
+              <div
+                key={`${shop.name}-${i}`}
+                onClick={() => !editMode && setSelectedShop(i)}
+                className={`aspect-square rounded-2xl flex flex-col items-center justify-center p-4 transition-transform active:scale-95 duration-150 relative cursor-pointer ${
                   active
                     ? "bg-[#050505] debossed border border-[#00E5FF]/30"
                     : "bg-[#0B0E14] embossed border border-white/[0.03]"
                 }`}
               >
+                {editMode && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDeleteShop(i); }}
+                    className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#FF4B4B]/20 flex items-center justify-center text-[#FF4B4B] text-xs border-none cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
                 <span className={`font-semibold text-lg ${active ? "text-[#00E5FF]" : "text-white"}`}>
                   {shop.name}
                 </span>
@@ -82,7 +330,7 @@ export default function QuickLogPage() {
                 >
                   {active ? "Selected" : shop.tag}
                 </span>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -94,7 +342,7 @@ export default function QuickLogPage() {
           Transaction Value
         </h2>
         <div className="bg-[#050505] debossed rounded-2xl p-6 flex items-baseline justify-center">
-          <span className="text-2xl text-slate-500 mr-2" style={{ fontFamily: "var(--font-mono)" }}>$</span>
+          <span className="text-2xl text-slate-500 mr-2" style={{ fontFamily: "var(--font-mono)" }}>£</span>
           <input
             type="text"
             inputMode="decimal"
@@ -110,24 +358,66 @@ export default function QuickLogPage() {
 
       {/* Category Chips */}
       <section>
-        <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4" style={{ fontFamily: "var(--font-mono)" }}>
-          Category
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-mono)" }}>
+            Category
+          </h2>
+          {editMode && (
+            <button
+              onClick={() => setShowAddCategory(true)}
+              className="text-[#00E5FF] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
+              style={{ fontFamily: "var(--font-mono)" }}
+            >
+              + Add
+            </button>
+          )}
+        </div>
+
+        {showAddCategory && (
+          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#00E5FF]/20 flex gap-2">
+            <input
+              type="text"
+              value={newCatEmoji}
+              onChange={(e) => setNewCatEmoji(e.target.value)}
+              placeholder="🏷️"
+              className="w-12 bg-[#050505] rounded-lg px-2 py-2 text-white text-center text-sm border-none focus:outline-none placeholder-slate-600"
+            />
+            <input
+              type="text"
+              value={newCatLabel}
+              onChange={(e) => setNewCatLabel(e.target.value)}
+              placeholder="Category name"
+              className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600"
+            />
+            <button onClick={handleAddCategory} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#00E5FF", color: "#050505" }}>Add</button>
+            <button onClick={() => setShowAddCategory(false)} className="px-2 py-2 rounded-lg text-slate-400 text-sm bg-transparent border-none cursor-pointer">✕</button>
+          </div>
+        )}
+
         <div className="flex overflow-x-auto gap-3 pb-2 hide-scrollbar">
-          {CATEGORIES.map((cat, i) => {
+          {categories.map((cat, i) => {
             const active = selectedCategory === i;
             return (
-              <button
-                key={cat.label}
-                onClick={() => setSelectedCategory(i)}
-                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-[#050505] debossed border border-[#00E5FF]/30 text-[#00E5FF]"
-                    : "bg-[#0B0E14] embossed border border-white/5 hover:text-[#00E5FF]"
-                }`}
-              >
-                {cat.emoji} {cat.label}
-              </button>
+              <div key={`${cat.label}-${i}`} className="relative">
+                {editMode && (
+                  <button
+                    onClick={() => handleDeleteCategory(i)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#FF4B4B]/20 flex items-center justify-center text-[#FF4B4B] text-[10px] border-none cursor-pointer z-10"
+                  >
+                    ✕
+                  </button>
+                )}
+                <button
+                  onClick={() => !editMode && setSelectedCategory(i)}
+                  className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                    active
+                      ? "bg-[#050505] debossed border border-[#00E5FF]/30 text-[#00E5FF]"
+                      : "bg-[#0B0E14] embossed border border-white/5 hover:text-[#00E5FF]"
+                  }`}
+                >
+                  {cat.emoji} {cat.label}
+                </button>
+              </div>
             );
           })}
         </div>
@@ -139,11 +429,11 @@ export default function QuickLogPage() {
           Paid By
         </h2>
         <div className="flex justify-around items-center">
-          {MEMBERS.map((m, i) => {
+          {payers.map((m, i) => {
             const active = selectedPayer === i;
             return (
               <button
-                key={m.initial}
+                key={m.id}
                 onClick={() => setSelectedPayer(i)}
                 className={`w-14 h-14 rounded-full bg-[#0B0E14] flex items-center justify-center font-bold text-lg transition-all ${
                   active ? "debossed" : "embossed"
@@ -162,6 +452,13 @@ export default function QuickLogPage() {
           })}
         </div>
       </section>
+
+      {/* Save Error */}
+      {saveError && (
+        <div className="text-sm text-[#FBBF24] bg-[#FBBF24]/10 px-4 py-2.5 rounded-xl">
+          {saveError}
+        </div>
+      )}
 
       {/* Save Button */}
       <button
