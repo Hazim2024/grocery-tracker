@@ -27,6 +27,7 @@ type AuthContextType = {
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<string | null>;
   signIn: (email: string, password: string) => Promise<string | null>;
+  signInWithGoogle: () => Promise<string | null>;
   signOut: () => Promise<void>;
   createHousehold: (name: string) => Promise<string | null>;
   joinHousehold: (code: string) => Promise<string | null>;
@@ -148,6 +149,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }
 
+  async function signInWithGoogle(): Promise<string | null> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) return error.message;
+    return null;
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     setUser(null);
@@ -216,6 +228,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         signUp,
         signIn,
+        signInWithGoogle,
         signOut,
         createHousehold,
         joinHousehold,

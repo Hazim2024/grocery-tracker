@@ -106,7 +106,7 @@ export default function ActivityPage() {
             {transactions.map((tx) => {
               const isDeleting = deletingId === tx.id;
               const isEditing = editingId === tx.id;
-              const isOwner = tx.member === profile?.name;
+              const isOwner = tx.member === profile?.name || profile?.role === "admin";
 
               return (
                 <div
