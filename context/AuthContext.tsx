@@ -138,6 +138,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (profileError) return profileError.message;
+
+    // Force sign out so user must confirm email first
+    await supabase.auth.signOut();
     return null;
   }
 

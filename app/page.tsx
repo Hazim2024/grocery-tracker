@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SHOPS as DEFAULT_SHOPS, CATEGORIES as DEFAULT_CATEGORIES } from "@/lib/constants";
 import { useTransactions } from "@/context/TransactionContext";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 type CustomShop = { name: string; tag: string };
 type CustomCategory = { emoji: string; label: string };
@@ -38,21 +39,42 @@ export default function QuickLogPage() {
   const [setupError, setSetupError] = useState("");
   const [setupLoading, setSetupLoading] = useState(false);
 
-  // Load custom shops/categories from localStorage
+  // Load custom shops/categories from Supabase
   useEffect(() => {
-    const savedShops = localStorage.getItem("custom_shops");
-    const savedCats = localStorage.getItem("custom_categories");
-    if (savedShops) setShops(JSON.parse(savedShops));
-    if (savedCats) setCategories(JSON.parse(savedCats));
-  }, []);
+    if (!household?.id) return;
+    async function loadSettings() {
+      const { data } = await supabase
+        .from("household_settings")
+        .select("custom_shops, custom_categories")
+        .eq("household_id", household!.id)
+        .single();
+      if (data) {
+        if (data.custom_shops?.length) setShops(data.custom_shops);
+        if (data.custom_categories?.length) setCategories(data.custom_categories);
+      }
+    }
+    loadSettings();
+  }, [household?.id]);
 
-  // Save to localStorage when changed
+  // Save shops to Supabase
   useEffect(() => {
-    localStorage.setItem("custom_shops", JSON.stringify(shops));
-  }, [shops]);
+    if (!household?.id) return;
+    supabase.from("household_settings").upsert({
+      household_id: household.id,
+      custom_shops: shops,
+      updated_at: new Date().toISOString(),
+    });
+  }, [shops, household?.id]);
+
+  // Save categories to Supabase
   useEffect(() => {
-    localStorage.setItem("custom_categories", JSON.stringify(categories));
-  }, [categories]);
+    if (!household?.id) return;
+    supabase.from("household_settings").upsert({
+      household_id: household.id,
+      custom_categories: categories,
+      updated_at: new Date().toISOString(),
+    });
+  }, [categories, household?.id]);
 
   // Default payer = logged in user
   const payers = household
