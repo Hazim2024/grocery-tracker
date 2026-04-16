@@ -17,6 +17,7 @@ type Household = {
   id: string;
   name: string;
   invite_code: string;
+  monthly_budget: number;
 };
 
 type AuthContextType = {
@@ -31,6 +32,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   createHousehold: (name: string) => Promise<string | null>;
   joinHousehold: (code: string) => Promise<string | null>;
+  updateBudget: (amount: number) => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -48,13 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [householdMembers, setHouseholdMembers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Generate a random color for new users
   const randomColor = () => {
     const colors = ["#3B82F6", "#FF6B35", "#A78BFA", "#34D399", "#F472B6", "#FBBF24"];
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
-  // Load user session on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -89,7 +89,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
 
     if (profileError || !profileData) {
-      // User exists in auth but no profile — sign them out so they see login
       console.log("No profile found, signing out");
       await supabase.auth.signOut();
       setUser(null);
@@ -127,7 +126,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) return error.message;
     if (!data.user) return "Signup failed";
 
-    // Create profile
     const initial = name.charAt(0).toUpperCase();
     const { error: profileError } = await supabase.from("profiles").insert({
       id: data.user.id,
@@ -139,7 +137,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (profileError) return profileError.message;
 
-    // Force sign out so user must confirm email first
     await supabase.auth.signOut();
     return null;
   }
@@ -174,11 +171,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function createHousehold(name: string): Promise<string | null> {
     if (!user) return "Not logged in";
 
-    // Generate invite code
     const { data: codeData } = await supabase.rpc("generate_invite_code");
     const code = codeData || Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    // Create household
     const { data: newHousehold, error } = await supabase
       .from("households")
       .insert({ name, invite_code: code, created_by: user.id })
@@ -187,13 +182,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error) return error.message;
 
-    // Update profile to link to household and set as admin
     await supabase
       .from("profiles")
       .update({ household_id: newHousehold.id, role: "admin" })
       .eq("id", user.id);
 
-    // Reload profile
     await loadProfile(user.id);
     return null;
   }
@@ -201,7 +194,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function joinHousehold(code: string): Promise<string | null> {
     if (!user) return "Not logged in";
 
-    // Find household by invite code
     const { data: found, error } = await supabase
       .from("households")
       .select("id")
@@ -210,14 +202,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error || !found) return "Invalid invite code";
 
-    // Update profile to join household
     await supabase
       .from("profiles")
       .update({ household_id: found.id })
       .eq("id", user.id);
 
-    // Reload profile
     await loadProfile(user.id);
+    return null;
+  }
+
+  async function updateBudget(amount: number): Promise<string | null> {
+    if (!household) return "No household";
+    const { error } = await supabase
+      .from("households")
+      .update({ monthly_budget: amount })
+      .eq("id", household.id);
+    if (error) return error.message;
+    setHousehold({ ...household, monthly_budget: amount });
     return null;
   }
 
@@ -235,6 +236,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         createHousehold,
         joinHousehold,
+        updateBudget,
       }}
     >
       {children}

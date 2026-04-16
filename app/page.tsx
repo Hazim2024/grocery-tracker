@@ -210,6 +210,39 @@ export default function QuickLogPage() {
           </div>
         </div>
       </div>
+      
+      {/* Budget Progress */}
+      {household && household.monthly_budget > 0 && (() => {
+        const now = new Date();
+        const monthSpend = transactions
+          .filter((t) => {
+            const d = new Date(t.created_at);
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          })
+          .reduce((s, t) => s + t.amount, 0);
+        const pct = Math.min((monthSpend / household.monthly_budget) * 100, 100);
+        const over = monthSpend > household.monthly_budget;
+        const near = pct >= 80 && !over;
+        const color = over ? "#FF4B4B" : near ? "#FBBF24" : "#3B82F6";
+        return (
+          <div
+            onClick={() => router.push("/stats")}
+            className="bg-[#0B0E14] rounded-xl px-4 py-3 border border-white/[0.03] cursor-pointer"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>
+                {over ? "Over Budget" : near ? "Near Budget Limit" : "Monthly Budget"}
+              </span>
+              <span className="text-[12px] font-semibold" style={{ fontFamily: "var(--font-mono)", color }}>
+                £{monthSpend.toFixed(2)} / £{household.monthly_budget.toFixed(2)}
+              </span>
+            </div>
+            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Floating Household Setup Card */}
       {!household && (
@@ -301,11 +334,13 @@ export default function QuickLogPage() {
         </div>
 
         {showAddShop && (
-          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#3B82F6]/20 flex gap-2">
-            <input type="text" value={newShopName} onChange={(e) => setNewShopName(e.target.value)} placeholder="Shop name" className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600" />
-            <input type="text" value={newShopTag} onChange={(e) => setNewShopTag(e.target.value)} placeholder="Tag" className="w-20 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600" />
-            <button onClick={handleAddShop} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505" }}>Add</button>
-            <button onClick={() => setShowAddShop(false)} className="px-2 py-2 rounded-lg text-slate-400 text-sm bg-transparent border-none cursor-pointer">✕</button>
+          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#3B82F6]/20 flex flex-col gap-2">
+            <input type="text" value={newShopName} onChange={(e) => setNewShopName(e.target.value)} placeholder="Shop name" className="w-full bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600" />
+            <input type="text" value={newShopTag} onChange={(e) => setNewShopTag(e.target.value)} placeholder="Tag (optional)" className="w-full bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600" />
+            <div className="flex gap-2">
+              <button onClick={() => setShowAddShop(false)} className="flex-1 py-2 rounded-lg bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer">Cancel</button>
+              <button onClick={handleAddShop} className="flex-1 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505" }}>Add</button>
+            </div>
           </div>
         )}
 
@@ -348,11 +383,15 @@ export default function QuickLogPage() {
         </div>
 
         {showAddCategory && (
-          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#3B82F6]/20 flex gap-2">
-            <input type="text" value={newCatEmoji} onChange={(e) => setNewCatEmoji(e.target.value)} placeholder="🏷️" className="w-12 bg-[#050505] rounded-lg px-2 py-2 text-white text-center text-sm border-none focus:outline-none placeholder-slate-600" />
-            <input type="text" value={newCatLabel} onChange={(e) => setNewCatLabel(e.target.value)} placeholder="Category name" className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600" />
-            <button onClick={handleAddCategory} className="px-3 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505" }}>Add</button>
-            <button onClick={() => setShowAddCategory(false)} className="px-2 py-2 rounded-lg text-slate-400 text-sm bg-transparent border-none cursor-pointer">✕</button>
+          <div className="bg-[#0B0E14] rounded-xl p-3 mb-3 border border-[#3B82F6]/20 flex flex-col gap-2">
+            <div className="flex gap-2">
+              <input type="text" value={newCatEmoji} onChange={(e) => setNewCatEmoji(e.target.value)} placeholder="🏷️" className="w-14 bg-[#050505] rounded-lg px-2 py-2 text-white text-center text-sm border-none focus:outline-none placeholder-slate-600" />
+              <input type="text" value={newCatLabel} onChange={(e) => setNewCatLabel(e.target.value)} placeholder="Category name" className="flex-1 bg-[#050505] rounded-lg px-3 py-2 text-white text-sm border-none focus:outline-none placeholder-slate-600" />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowAddCategory(false)} className="flex-1 py-2 rounded-lg bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer">Cancel</button>
+              <button onClick={handleAddCategory} className="flex-1 py-2 rounded-lg text-sm font-semibold border-none cursor-pointer" style={{ background: "#3B82F6", color: "#050505" }}>Add</button>
+            </div>
           </div>
         )}
 

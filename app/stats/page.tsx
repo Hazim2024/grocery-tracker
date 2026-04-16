@@ -7,7 +7,10 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function StatsPage() {
   const { transactions } = useTransactions();
-  const { profile, householdMembers, household } = useAuth();
+  const { profile, householdMembers, household, updateBudget } = useAuth();
+  const [editingBudget, setEditingBudget] = useState(false);
+  const [budgetInput, setBudgetInput] = useState("");
+  const [budgetSaving, setBudgetSaving] = useState(false);
   const [monthOffset, setMonthOffset] = useState(0);
   const [statsView, setStatsView] = useState<"category" | "shop">("category");
 
@@ -86,6 +89,104 @@ export default function StatsPage() {
           </svg>
         </button>
       </div>
+
+      {/* Budget Card */}
+      {household && isCurrentMonth && (() => {
+        const budget = household.monthly_budget || 0;
+        const pct = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
+        const over = total > budget && budget > 0;
+        const color = over ? "#FF4B4B" : pct >= 80 ? "#FBBF24" : "#3B82F6";
+        const remaining = budget - total;
+
+        const handleSaveBudget = async () => {
+          const val = parseFloat(budgetInput);
+          if (isNaN(val) || val < 0) return;
+          setBudgetSaving(true);
+          await updateBudget(val);
+          setBudgetSaving(false);
+          setEditingBudget(false);
+        };
+
+        return (
+          <div className="bg-[#0B0E14] embossed rounded-2xl p-4 border border-white/[0.03] mb-6">
+            {editingBudget ? (
+              <div>
+                <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-2" style={{ fontFamily: "var(--font-mono)" }}>
+                  Set Monthly Budget
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1 flex items-center bg-[#050505] rounded-lg px-3 py-2">
+                    <span className="text-slate-500 mr-1" style={{ fontFamily: "var(--font-mono)" }}>£</span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      autoFocus
+                      value={budgetInput}
+                      onChange={(e) => setBudgetInput(e.target.value.replace(/[^0-9.]/g, ""))}
+                      placeholder="0.00"
+                      className="bg-transparent border-none focus:outline-none text-white w-full"
+                      style={{ fontFamily: "var(--font-mono)" }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setEditingBudget(false)}
+                    className="px-3 py-2 rounded-lg bg-transparent border border-white/10 text-slate-400 text-sm cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveBudget}
+                    disabled={budgetSaving}
+                    className="px-4 py-2 rounded-lg font-semibold text-sm border-none cursor-pointer"
+                    style={{ background: "#3B82F6", color: "#050505", opacity: budgetSaving ? 0.6 : 1 }}
+                  >
+                    {budgetSaving ? "..." : "Save"}
+                  </button>
+                </div>
+              </div>
+            ) : budget > 0 ? (
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)" }}>
+                      Monthly Budget
+                    </div>
+                    <div className="text-[20px] font-bold text-white mt-0.5" style={{ fontFamily: "var(--font-mono)" }}>
+                      £{total.toFixed(2)} <span className="text-slate-500 text-[14px]">/ £{budget.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { setBudgetInput(budget.toString()); setEditingBudget(true); }}
+                    className="text-[#3B82F6] text-[11px] font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer"
+                    style={{ fontFamily: "var(--font-mono)" }}
+                  >
+                    Edit
+                  </button>
+                </div>
+                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
+                </div>
+                <div className="text-[11px] mt-2" style={{ fontFamily: "var(--font-mono)", color }}>
+                  {over
+                    ? `£${Math.abs(remaining).toFixed(2)} over budget`
+                    : `£${remaining.toFixed(2)} remaining · ${pct.toFixed(0)}% used`}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="text-[12px] text-slate-400 mb-3">No monthly budget set</div>
+                <button
+                  onClick={() => { setBudgetInput(""); setEditingBudget(true); }}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm border-none cursor-pointer"
+                  style={{ background: "#3B82F6", color: "#050505" }}
+                >
+                  Set Budget
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Bar Chart */}
       <div className="bg-[#0B0E14] embossed rounded-2xl p-4 border border-white/[0.03] mb-6">
