@@ -266,27 +266,30 @@ export default function ActivityPage() {
           </div>
 
           {/* Share Button */}
-          <button
-            onClick={generateShareText}
-            className="w-full mt-6 py-4 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all active:scale-[0.97] embossed border border-white/[0.03] cursor-pointer"
-            style={{
-              background: copied ? "#34D39915" : "#0B0E14",
-              color: copied ? "#34D399" : "#3B82F6",
-            }}
-          >
-            {copied ? (
-              <>✅ Copied — paste in WhatsApp</>
-            ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                  <polyline points="16 6 12 2 8 6" />
-                  <line x1="12" y1="2" x2="12" y2="15" />
-                </svg>
-                Generate &amp; Copy Summary
-              </>
-            )}
-          </button>
+          <div className="fixed bottom-[88px] left-1/2 -translate-x-1/2 w-full max-w-[480px] px-6 z-30">
+            <button
+              onClick={generateShareText}
+              className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all active:scale-[0.97] border border-white/[0.03] cursor-pointer"
+              style={{
+                background: copied ? "#34D399" : "#0B0E14",
+                color: copied ? "#050505" : "#3B82F6",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              {copied ? (
+                <>✅ Copied — paste in WhatsApp</>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                  </svg>
+                  Generate &amp; Copy Summary
+                </>
+              )}
+            </button>
+          </div>
         </>
       )}
 
