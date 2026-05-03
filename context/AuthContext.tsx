@@ -149,16 +149,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }
 
-  async function signInWithGoogle(): Promise<string | null> {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    if (error) return error.message;
-    return null;
-  }
+async function signInWithGoogle(): Promise<string | null> {
+  const redirectUrl = process.env.NODE_ENV === 'production'
+    ? 'https://grocery-tracker-khaki.vercel.app//auth/callback'
+    : `${window.location.origin}/auth/callback`;
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+  if (error) return error.message;
+  return null;
+}
 
   async function signOut() {
     await supabase.auth.signOut();
