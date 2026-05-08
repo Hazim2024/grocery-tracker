@@ -53,7 +53,13 @@ export default function StatsPage() {
   const maxDaily = Math.max(...dailySpend, 1);
 
   const members = household
-    ? householdMembers
+    ? [...householdMembers].sort((a, b) => {
+       
+        // Then by contribution (highest to lowest)
+        const aSpend = monthTxs.filter((t) => t.member === a.name).reduce((s, t) => s + t.amount, 0);
+        const bSpend = monthTxs.filter((t) => t.member === b.name).reduce((s, t) => s + t.amount, 0);
+        return bSpend - aSpend;
+      })
     : profile
       ? [{ id: profile.id, initial: profile.initial, name: profile.name, color: profile.color }]
       : [];
@@ -307,9 +313,30 @@ export default function StatsPage() {
               const memberSpend = monthTxs
                 .filter((t) => t.member === m.name)
                 .reduce((s, t) => s + t.amount, 0);
+              const highestSpend = Math.max(
+                ...members.map((member) =>
+                  monthTxs
+                    .filter((t) => t.member === member.name)
+                    .reduce((s, t) => s + t.amount, 0)
+                )
+              );
+              const isTopContributor =
+                memberSpend > 0 && memberSpend === highestSpend;
               const pct = total > 0 ? (memberSpend / total) * 100 : 0;
               return (
-                <div key={m.id} className="flex items-center gap-3.5">
+                <div
+                  key={m.id}
+                  className="flex items-center gap-3.5 rounded-2xl p-3 transition-all"
+                  style={{
+                    background: isTopContributor ? `${m.color}08` : "transparent",
+                    border: isTopContributor
+                      ? `1px solid ${m.color}25`
+                      : "1px solid transparent",
+                    boxShadow: isTopContributor
+                      ? `0 0 18px ${m.color}15`
+                      : "none",
+                  }}
+                >
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[13px]"
                     style={{
@@ -323,8 +350,14 @@ export default function StatsPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between mb-1">
-                      <span className="text-white text-[13px] font-semibold">
+                      <span className="text-white text-[13px] font-semibold flex items-center gap-1.5">
                         {m.name}
+
+                        {isTopContributor && (
+                          <span className="text-[12px]">
+                            👑
+                          </span>
+                        )}
                         {m.id === profile?.id && <span className="text-slate-500 text-[10px] ml-1">(You)</span>}
                       </span>
                       <span className="text-[13px]" style={{ fontFamily: "var(--font-mono)", color: m.color }}>

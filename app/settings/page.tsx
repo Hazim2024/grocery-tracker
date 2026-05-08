@@ -110,7 +110,11 @@ export default function SettingsPage() {
           Family Members ({householdMembers.length})
         </h3>
         <div className="flex flex-col gap-2">
-          {householdMembers.map((m) => (
+          {[...householdMembers].sort((a, b) => {
+            if (a.role === "admin" && b.role !== "admin") return -1;
+            if (b.role === "admin" && a.role !== "admin") return 1;
+            return 0;
+          }).map((m) => (
             <div key={m.id} className="bg-[#0B0E14] embossed rounded-2xl p-4 flex items-center gap-3.5 border border-white/[0.03]">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"

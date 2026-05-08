@@ -69,7 +69,15 @@ export default function QuickLogPage() {
   };
 
   const payers = household
-    ? householdMembers
+    ? [...householdMembers].sort((a, b) => {
+        // Admin first
+        if (a.role === "admin" && b.role !== "admin") return -1;
+        if (b.role === "admin" && a.role !== "admin") return 1;
+        // Then by spend (highest to lowest)
+        const aSpend = transactions.filter((t) => t.member === a.name).reduce((s, t) => s + t.amount, 0);
+        const bSpend = transactions.filter((t) => t.member === b.name).reduce((s, t) => s + t.amount, 0);
+        return bSpend - aSpend;
+      })
     : profile
       ? [{ id: profile.id, initial: profile.initial, name: profile.name, color: profile.color }]
       : [];
