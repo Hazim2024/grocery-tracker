@@ -13,6 +13,7 @@ export default function StatsPage() {
   const [budgetSaving, setBudgetSaving] = useState(false);
   const [monthOffset, setMonthOffset] = useState(0);
   const [statsView, setStatsView] = useState<"category" | "shop">("category");
+  const [chartView, setChartView] = useState<"daily" | "weekly" | "monthly">("daily");
 
   const now = new Date();
   const viewDate = new Date(now.getFullYear(), now.getMonth() - monthOffset, 1);
@@ -65,6 +66,59 @@ export default function StatsPage() {
       : [];
 
   const breakdownItems = statsView === "category" ? categorySpend : shopSpend;
+  // Chart averages
+  const monthlyAverage =
+    monthTxs.length > 0
+      ? total / (isCurrentMonth ? now.getDate() : daysInMonth)
+      : 0;
+  const dailyAverage = (() => {
+  const last7Days: number[] = [];
+
+    const endDate = isCurrentMonth
+      ? new Date()
+      : new Date(
+          viewDate.getFullYear(),
+          viewDate.getMonth() + 1,
+          0
+        );
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(endDate);
+      d.setDate(endDate.getDate() - i);
+
+      const dayTransactions = transactions.filter((t) => {
+        const txDate = new Date(t.created_at);
+        return txDate.toDateString() === d.toDateString();
+      });
+
+      last7Days.push(
+        dayTransactions.reduce((sum, t) => sum + t.amount, 0)
+      );
+    }
+
+    return last7Days.reduce((a, b) => a + b, 0) / 7;
+  })();
+  const yearlyAverage = (() => {
+    const monthlyTotals: number[] = [];
+
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+      const monthTotal = transactions
+        .filter((t) => {
+          const txDate = new Date(t.created_at);
+          return (
+            txDate.getMonth() === d.getMonth() &&
+            txDate.getFullYear() === d.getFullYear()
+          );
+        })
+        .reduce((s, t) => s + t.amount, 0);
+
+      monthlyTotals.push(monthTotal);
+    }
+
+    return monthlyTotals.reduce((a, b) => a + b, 0) / 12;
+  })();
 
   return (
     <div className="px-6 pt-6 pb-32">
@@ -196,43 +250,293 @@ export default function StatsPage() {
 
       {/* Bar Chart */}
       <div className="bg-[#0B0E14] embossed rounded-2xl p-4 border border-white/[0.03] mb-6">
-        <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3" style={{ fontFamily: "var(--font-mono)" }}>
-          Daily Spending
-        </h3>
-        <div className="flex items-end gap-[2px] h-[120px] relative">
-          {dailySpend.map((val, i) => {
-            const height = maxDaily > 0 ? (val / maxDaily) * 100 : 0;
-            const isToday = isCurrentMonth && i + 1 === now.getDate();
+        <div className="flex justify-between items-start mb-3">
+          <div>
+            <h3
+              className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]"
+              style={{ fontFamily: "var(--font-mono)" }}
+            >
+              {chartView === "daily"
+                ? "Last 7 Days"
+                : chartView === "weekly"
+                ? "This Month"
+                : "Last Year"}{" "}
+              Spending
+            </h3>
+
+            <p
+              className="text-[11px] text-slate-400 mt-1"
+              style={{ fontFamily: "var(--font-mono)" }}
+            >
+              Avg{" "}
+              {chartView === "daily"
+                ? `£${dailyAverage.toFixed(2)}/day`
+                : chartView === "weekly"
+                ? `£${monthlyAverage.toFixed(2)}/day`
+                : `£${yearlyAverage.toFixed(2)}/month`}
+            </p>
+          </div>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setChartView("daily")}
+              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border cursor-pointer transition-all"
+              style={{
+                background: chartView === "daily" 
+                  ? "linear-gradient(135deg, #3B82F620, #3B82F610)" 
+                  : "rgba(255,255,255,0.02)",
+                backdropFilter: chartView === "daily" ? "blur(10px)" : "blur(5px)",
+                border: chartView === "daily" ? "1px solid #3B82F640" : "1px solid rgba(255,255,255,0.05)",
+                color: chartView === "daily" ? "#3B82F6" : "#64748b",
+                fontFamily: "var(--font-mono)",
+                boxShadow: chartView === "daily" ? "0 0 20px rgba(59,130,246,0.15)" : "none"
+              }}
+            >
+              7D
+            </button>
+            <button
+              onClick={() => setChartView("weekly")}
+              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border cursor-pointer transition-all"
+              style={{
+                background: chartView === "weekly" 
+                  ? "linear-gradient(135deg, #3B82F620, #3B82F610)" 
+                  : "rgba(255,255,255,0.02)",
+                backdropFilter: chartView === "weekly" ? "blur(10px)" : "blur(5px)",
+                border: chartView === "weekly" ? "1px solid #3B82F640" : "1px solid rgba(255,255,255,0.05)",
+                color: chartView === "weekly" ? "#3B82F6" : "#64748b",
+                fontFamily: "var(--font-mono)",
+                boxShadow: chartView === "weekly" ? "0 0 20px rgba(59,130,246,0.15)" : "none"
+              }}
+            >
+              1M
+            </button>
+            <button
+              onClick={() => setChartView("monthly")}
+              className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border cursor-pointer transition-all"
+              style={{
+                background: chartView === "monthly" 
+                  ? "linear-gradient(135deg, #3B82F620, #3B82F610)" 
+                  : "rgba(255,255,255,0.02)",
+                backdropFilter: chartView === "monthly" ? "blur(10px)" : "blur(5px)",
+                border: chartView === "monthly" ? "1px solid #3B82F640" : "1px solid rgba(255,255,255,0.05)",
+                color: chartView === "monthly" ? "#3B82F6" : "#64748b",
+                fontFamily: "var(--font-mono)",
+                boxShadow: chartView === "monthly" ? "0 0 20px rgba(59,130,246,0.15)" : "none"
+              }}
+            >
+              1Y
+            </button>
+          </div>
+        </div>
+
+        {/* Chart rendering based on view */}
+        {(() => {
+          if (chartView === "daily") {
+            // Last 7 days of selected month
+            const last7Days: number[] = [];
+            const last7Labels: string[] = [];
+
+            // if viewing current month → use today
+            // if viewing older month → use last day of that month
+            const endDate = isCurrentMonth
+              ? new Date()
+              : new Date(
+                  viewDate.getFullYear(),
+                  viewDate.getMonth() + 1,
+                  0
+                );
+
+            for (let i = 6; i >= 0; i--) {
+              const d = new Date(endDate);
+              d.setDate(endDate.getDate() - i);
+
+              const dayTransactions = transactions.filter((t) => {
+                const txDate = new Date(t.created_at);
+                return txDate.toDateString() === d.toDateString();
+              });
+
+              last7Days.push(
+                dayTransactions.reduce((s, t) => s + t.amount, 0)
+              );
+
+              last7Labels.push(
+                d.toLocaleDateString("en-US", {
+                  weekday: "short",
+                })
+              );
+            }
+            const max7Days = Math.max(...last7Days, 1);
+          
+
             return (
-              <div
-                key={i}
-                className="flex-1 flex flex-col items-center justify-end h-full relative group"
-              >
-                {/* Tooltip */}
-                {val > 0 && (
-                  <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[#1E2533] text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
-                    style={{ fontFamily: "var(--font-mono)" }}
-                  >
-                    £{val.toFixed(2)}
-                  </div>
-                )}
-                <div
-                  className="w-full rounded-sm transition-all duration-300"
-                  style={{
-                    height: `${Math.max(height, val > 0 ? 4 : 0)}%`,
-                    background: isToday ? "#3B82F6" : val > 0 ? "#3B82F640" : "transparent",
-                    minHeight: val > 0 ? "3px" : "0px",
-                  }}
-                />
-              </div>
+              <>
+                <div className="flex items-end gap-2 h-[120px] relative">
+                  {last7Days.map((val, i) => {
+                    const height = max7Days > 0 ? (val / max7Days) * 100 : 0;
+                    const isToday = isCurrentMonth && i === 6;
+                    // Color gradient based on spending level
+                    const getBarColor = (value: number) => {
+                      const percent = (value / max7Days) * 100;
+                      if (percent > 75) return isToday ? "#FF4B4B" : "#FF4B4B80";
+                      if (percent > 50) return isToday ? "#FBBF24" : "#FBBF2480";
+                      if (percent > 25) return isToday ? "#3B82F6" : "#3B82F680";
+                      return isToday ? "#34D399" : "#34D39980";
+                    };
+                    
+                    return (
+                      <div
+                        key={i}
+                        className="flex-1 flex flex-col items-center justify-end h-full relative group"
+                      >
+                        {val > 0 && (
+                          <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[#1E2533] text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+                            style={{ fontFamily: "var(--font-mono)" }}
+                          >
+                            £{val.toFixed(2)}
+                          </div>
+                        )}
+                        <div
+                          className="w-full rounded transition-all duration-300"
+                          style={{
+                            height: `${Math.max(height, val > 0 ? 4 : 0)}%`,
+                            background: val > 0 ? getBarColor(val) : "transparent",
+                            minHeight: val > 0 ? "3px" : "0px",
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between mt-2">
+                  {last7Labels.map((label, i) => (
+                    <span key={i} className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </>
             );
-          })}
-        </div>
-        <div className="flex justify-between mt-2">
-          <span className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>1</span>
-          <span className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>{Math.ceil(daysInMonth / 2)}</span>
-          <span className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>{daysInMonth}</span>
-        </div>
+          } else if (chartView === "weekly") {
+            // Month view (31 days)
+            const getBarColor = (value: number, max: number) => {
+              const percent = (value / max) * 100;
+              if (percent > 75) return "#FF4B4B60";
+              if (percent > 50) return "#FBBF2460";
+              if (percent > 25) return "#3B82F660";
+              return "#34D39960";
+            };
+
+            return (
+              <>
+                <div className="flex items-end gap-[2px] h-[120px] relative">
+                  {dailySpend.map((val, i) => {
+                    const height = maxDaily > 0 ? (val / maxDaily) * 100 : 0;
+                    const isToday = isCurrentMonth && i + 1 === now.getDate();
+                    
+                    return (
+                      <div
+                        key={i}
+                        className="flex-1 flex flex-col items-center justify-end h-full relative group"
+                      >
+                        {val > 0 && (
+                          <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[#1E2533] text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+                            style={{ fontFamily: "var(--font-mono)" }}
+                          >
+                            £{val.toFixed(2)}
+                          </div>
+                        )}
+                        <div
+                          className="w-full rounded-sm transition-all duration-300"
+                          style={{
+                            height: `${Math.max(height, val > 0 ? 4 : 0)}%`,
+                            background: isToday 
+                              ? "#3B82F6" 
+                              : val > 0 
+                                ? getBarColor(val, maxDaily)
+                                : "transparent",
+                            minHeight: val > 0 ? "3px" : "0px",
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>1</span>
+                  <span className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>{Math.ceil(daysInMonth / 2)}</span>
+                  <span className="text-[9px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>{daysInMonth}</span>
+                </div>
+              </>
+            );
+          } else {
+            // Year view - show last 12 months
+            const monthlySpend: { month: string; amount: number }[] = [];
+            for (let i = 11; i >= 0; i--) {
+              const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+              const monthTx = transactions.filter((t) => {
+                const txDate = new Date(t.created_at);
+                return txDate.getMonth() === d.getMonth() && txDate.getFullYear() === d.getFullYear();
+              });
+              const total = monthTx.reduce((s, t) => s + t.amount, 0);
+              monthlySpend.push({
+                month: d.toLocaleString("default", { month: "short" }),
+                amount: total
+              });
+            }
+            const maxMonthly = Math.max(...monthlySpend.map(m => m.amount), 1);
+            
+            const getBarColor = (value: number) => {
+              const percent = (value / maxMonthly) * 100;
+              if (percent > 75) return "#FF4B4B60";
+              if (percent > 50) return "#FBBF2460";
+              if (percent > 25) return "#3B82F660";
+              return "#34D39960";
+            };
+
+            return (
+              <>
+                <div className="flex items-end gap-1 h-[120px] relative">
+                  {monthlySpend.map((item, i) => {
+                    const height = maxMonthly > 0 ? (item.amount / maxMonthly) * 100 : 0;
+                    const isCurrentMonth = i === 11;
+                    return (
+                      <div
+                        key={i}
+                        className="flex-1 flex flex-col items-center justify-end h-full relative group"
+                      >
+                        {item.amount > 0 && (
+                          <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[#1E2533] text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+                            style={{ fontFamily: "var(--font-mono)" }}
+                          >
+                            £{item.amount.toFixed(2)}
+                          </div>
+                        )}
+                        <div
+                          className="w-full rounded transition-all duration-300"
+                          style={{
+                            height: `${Math.max(height, item.amount > 0 ? 4 : 0)}%`,
+                            background: isCurrentMonth 
+                              ? "#3B82F6" 
+                              : item.amount > 0 
+                                ? getBarColor(item.amount)
+                                : "transparent",
+                            minHeight: item.amount > 0 ? "3px" : "0px",
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between mt-2">
+                  {monthlySpend.map((item, i) => (
+                    <span key={i} className="text-[8px] text-slate-600" style={{ fontFamily: "var(--font-mono)" }}>
+                      {item.month}
+                    </span>
+                  ))}
+                </div>
+              </>
+            );
+          }
+        })()}
       </div>
 
       {/* View Toggle */}
