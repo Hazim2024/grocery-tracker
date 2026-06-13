@@ -114,7 +114,15 @@ export default function QuickLogPage() {
     }
   }, [profile, payers.length]);
 
-  const totalSpend = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalSpend = (() => {
+    const now = new Date();
+    return transactions
+      .filter((t) => {
+        const d = new Date(t.created_at);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+  })();
 
   const handleAmount = (val: string) => {
     const clean = val.replace(/[^0-9.]/g, "");
